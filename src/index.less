@@ -1,0 +1,90 @@
+@font-face {
+  font-family: 'Montserrat';
+  src        : url('./vendor/fonts/static/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style : normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src        : url('./vendor/fonts/static/Montserrat-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style : normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src        : url('./vendor/fonts/static/Montserrat-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style : normal;
+}
+
+@keyframes manifestation {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.manifestationAnimation(@duration: 0.7s, @timing-function: ease-in-out) {
+  animation: manifestation @duration @timing-function;
+}
+
+.fadeInAnimation(@duration: 0.7s, @timing-function: ease-in-out) {
+  animation: fadeIn @duration @timing-function;
+}
+
+.flexLayout(@justify: none, @align: center, @direction: row) {
+  display       : flex;
+  flex-direction: @direction;
+  align-items   : @align;
+}
+
+.flexLayout(@justify, @align: center, @direction: row) when not (@justify =none) {
+  justify-content: @justify;
+}
+
+.absolutPosition(@top: 0, @left: 0) {
+  position: absolute;
+  top     : @top;
+  left    : @left;
+}
+
+@app-bgColor                    : #ffffffe8;
+@header-bgColor                 : #302f2f;
+@dropZone-bgColor               : #222;
+@dropZone-textColor             : #8585AD;
+@dropZone-hoverTextColor        : #555;
+@dropZone-hoverBgColor          : #eee;
+@dropZone-borderColor           : #555;
+@dropZone-hoverBorderColor      : #111;
+@dropZone-progressBgColor       : #eee;
+@dropZone-progressFillerBgColor : #801ab3;
+
+
+@crossOutContainerColor : red;
+
+
+.fontMixin(@weight: normal, @style: normal) {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: @weight;
+  font-style : @style;
+}
+
+.widthHeightBlock(@width: 100px, @height: 100px) {
+  width : @width;
+  height: @height;
+}

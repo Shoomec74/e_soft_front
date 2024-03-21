@@ -1,0 +1,43 @@
+@keyframes flicker {
+
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+
+    text-shadow:
+      0 0 4px #ffeb3b,
+      0 0 11px #14ffe9,
+      0 0 19px #ff00e0,
+      0 0 40px #ff00e0,
+      0 0 80px #14ffe9,
+      0 0 90px #14ffe9,
+      0 0 100px #ffeb3b,
+      0 0 150px #ff00e0;
+
+  }
+
+  20%,
+  24%,
+  55% {
+    text-shadow: none;
+  }
+}
+
+
+.page404 {
+  display        : grid;
+  justify-content: center;
+  align-items    : center;
+  height         : calc(100vh - 128px);
+  justify-items  : center;
+  align-content  : center;
+}
+
+.neonText {
+  color    : #fff;
+  animation: flicker 1.5s infinite alternate;
+}
