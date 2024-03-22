@@ -5,9 +5,9 @@ import {
   TUserRegisterData,
   TUserRegisterResponse,
   TUserSigninData,
-} from '../utils/types/auth';
+} from '../../utils/types/auth';
 
-import { getReq, postReq } from '../api/api';
+import { getReq, postReq } from '../apiMethods';
 
 //-- Функция для отправки запроса регистрации пользователя --//
 function registerApi(userInfo: TUserRegisterData) {
@@ -30,7 +30,7 @@ function updateTokenApi(refreshToken: string) {
 //-- Функция для отправки запроса на выход из аккаунта --//
 function logoutApi() {
   //-- Отправляет запрос на API для выхода из аккаунта, требует авторизации --//
-  return postReq<TSignoutResponse>({ uri: 'api/logout', auth: true });
+  return getReq<TSignoutResponse>({ uri: 'api/logout', auth: true });
 }
 
 //-- Функция для отправки запроса авторизации пользователя --//

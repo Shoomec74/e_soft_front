@@ -5,8 +5,8 @@ import {
   registerApi,
   userInfoApi,
   updateTokenApi,
-} from '../../auth/auth';
-import { setCookie, deleteCookie } from '../../auth/auth';
+} from '../../api/auth/auth';
+import { setCookie, deleteCookie } from '../../api/auth/auth';
 import {
   TUserSigninData,
   TSigninResponse,
@@ -58,24 +58,7 @@ export const signOut = createAsyncThunk(
       deleteCookie('token');
       return;
     } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-    }
-  },
-);
-
-//-- Асинхронное thunk-действие регистраии в приложении --//
-export const register = createAsyncThunk(
-  '/api/register',
-  async (userData: TUserRegisterData, { rejectWithValue }) => {
-    try {
-      const response = await registerApi(userData);
-      return response;
-    } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
+      return rejectWithValue(error);
     }
   },
 );
@@ -87,9 +70,7 @@ export const userInfo = createAsyncThunk(
     try {
       return await userInfoApi();
     } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
+      return rejectWithValue(error);
     }
   },
 );
@@ -104,9 +85,7 @@ export const updateToken = createAsyncThunk(
       localStorage.setItem('refreshToken', response.refreshToken);
       return response;
     } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
+      return rejectWithValue(error);
     }
   },
 );
@@ -121,25 +100,6 @@ const authorizationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      //-- Обработка состояний во время регистрации --//
-      .addCase(register.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isRegistered = true;
-        state.allUsers = [
-          ...(state.allUsers || []),
-          action.payload as TUserRegisterResponse,
-        ];
-        state.error = null;
-      })
-      .addCase(register.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
-      })
-
       //-- Обработка состояний во время входа в приложение --//
       .addCase(signIn.pending, (state) => {
         state.isLoading = true;

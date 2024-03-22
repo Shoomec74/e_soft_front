@@ -1,4 +1,4 @@
-import { getCookie } from '../auth/auth';
+import { getCookie } from './auth/auth';
 
 //-- Базовый URL API --//
 const BASE_URL = 'http://localhost:3000';

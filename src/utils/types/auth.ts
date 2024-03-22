@@ -17,6 +17,7 @@ export type TUserRegisterResponse = {
   lastName: string;
   middleName: string;
   role: string;
+  manager?: TUserRegisterResponse;
 };
 
 export type TUserSigninData = {
@@ -31,6 +32,7 @@ export type TUserRegisterData = {
   lastName: string;
   middleName: string;
   role?: string;
+  subordinateIds?: number[],
 };
 
 export type TSignoutResponse = {
@@ -46,4 +48,10 @@ export enum UserRole {
 export interface ITokens {
   accessToken: string;
   refreshToken: string;
+}
+
+export enum PriorityTask {
+  HIGH = 'high',
+  MEDIUM = 'medium',
+  LOW = 'low',
 }

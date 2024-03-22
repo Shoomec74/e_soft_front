@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { getCookie } from '../../auth/auth';
+import { getCookie } from '../../api/auth/auth';
 
 interface ProtectedRouteProps {}
 

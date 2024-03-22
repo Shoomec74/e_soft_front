@@ -1,4 +1,4 @@
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import styles from './App.module.less';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import { FC, useEffect } from 'react';
@@ -7,15 +7,15 @@ import { defineRulesFor } from '../../ability/Ability';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
 import Login from '../../pages/login/Login';
 import RoleGuard from '../RoleGuard/RoleGuard';
-import { deleteCookie, getCookie } from '../../auth/auth';
+import { deleteCookie, getCookie } from '../../api/auth/auth';
 import {
   userInfo,
   updateToken,
 } from '../../services/reducers/authorization.slice';
 import { Page404 } from '../../pages/page404/Page404';
 import AdminPanel from '../../pages/adminPanel/adminPanel';
+import Crm from '../../pages/crm/crm';
 
-//App.tsx
 const App: FC = () => {
   //-- Использование стилей для компонента App --//
   const { app } = styles;
@@ -34,8 +34,6 @@ const App: FC = () => {
 
   const ability = defineRulesFor(userRole);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     if (token && !user) {
       dispatch(userInfo());
@@ -44,7 +42,7 @@ const App: FC = () => {
       deleteCookie('token');
       dispatch(updateToken(refreshToken));
     }
-  }, [user]);
+  }, [user, isJwtExpired]);
 
   return (
     <div className={app}>
@@ -56,14 +54,7 @@ const App: FC = () => {
             <Route element={<RoleGuard />}>
               <Route path="/admin" element={<AdminPanel />} />
             </Route>
-            <Route
-              path="/crm"
-              element={
-                <div>
-                  CRM <Link to="/admin">Admin</Link>
-                </div>
-              }
-            />
+            <Route path="/crm" element={<Crm />} />
           </Route>
         </Routes>
       </AbilityContext.Provider>

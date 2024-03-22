@@ -2,7 +2,7 @@ import { FC, FormEvent, useState } from 'react';
 import styles from './login.module.less';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { getCookie } from '../../auth/auth';
+import { getCookie } from '../../api/auth/auth';
 import { Navigate, useLocation } from 'react-router-dom';
 import useForm from '../../hooks/useForm/useForm';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
@@ -40,8 +40,6 @@ const Login: FC = () => {
     dispatch(signIn({ login, password }));
     setValues(initialValuesForm);
   };
-
-  const [open, setOpen] = useState(false);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
