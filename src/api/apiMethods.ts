@@ -2,7 +2,7 @@ import { ICustomErrorResponse } from '../utils/types/types';
 import { getCookie } from './auth/auth';
 
 //-- Базовый URL API --//
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://cleanwaveapp.ru';
 
 //-- Расширенный интерфейс стандартного Response для добавления типизации к методу json() --//
 interface IResponse<T> extends Response {
