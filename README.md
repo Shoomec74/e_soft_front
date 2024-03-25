@@ -1,6 +1,6 @@
 # Веб-приложение списка задач (TODO list).
 
-Ссылка на Бэкенд часть приожение на __[GitHub](git@github.com:Shoomec74/e_soft_task.git)__
+Ссылка на Бэкенд часть приожение на __[GitHub](https://github.com/Shoomec74/e_soft_task)__
 
 ## Обзор
 
