@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { registerApi } from '../../api/auth/auth';
+
 import {
+  ICustomErrorResponse,
   TSigninResponse,
   TUserRegisterData,
   TUserRegisterResponse,
-} from '../../utils/types/auth';
-import { getAllUsersApi } from '../../api/users/users';
+} from '../../utils/types/types';
+import { getAllUsersApi, registerUserApi } from '../../api/users/users';
+import { clearErrorsState } from './commonActions';
 
-type TAuthorizationState = {
+type TUsersState = {
   isLoading: boolean;
   isRegistered: boolean;
   user: TSigninResponse | null;
@@ -15,7 +17,7 @@ type TAuthorizationState = {
   error: string | null;
 };
 
-const initialState: TAuthorizationState = {
+const initialState: TUsersState = {
   isLoading: false,
   isRegistered: false,
   user: null,
@@ -24,14 +26,15 @@ const initialState: TAuthorizationState = {
 };
 
 //-- Асинхронное thunk-действие регистраии в приложении --//
-export const register = createAsyncThunk(
-  '/api/register',
+export const registerUser = createAsyncThunk(
+  '/api/registerUser',
   async (userData: TUserRegisterData, { rejectWithValue }) => {
     try {
-      const response = await registerApi(userData);
+      const response = await registerUserApi(userData);
       return response;
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -44,7 +47,8 @@ export const getAllUsers = createAsyncThunk(
       const response = await getAllUsersApi();
       return response;
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -53,10 +57,6 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    clearErrorUsers(state) {
-      state.error = null;
-      //state.isRegistered = false;
-    },
     resetRegistrationState(state) {
       state.isRegistered = false;
     },
@@ -64,12 +64,12 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //-- Обработка состояний во время регистрации --//
-      .addCase(register.pending, (state) => {
+      .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
         state.isRegistered = false;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isRegistered = true;
         state.allUsers = [
@@ -78,7 +78,7 @@ const usersSlice = createSlice({
         ];
         state.error = null;
       })
-      .addCase(register.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isRegistered = false;
         state.error = action.payload as string;
@@ -97,10 +97,13 @@ const usersSlice = createSlice({
       .addCase(getAllUsers.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      .addCase(clearErrorsState, (state) => {
+        state.error = null;
       });
   },
 });
 
-export const { clearErrorUsers, resetRegistrationState } = usersSlice.actions;
+export const { resetRegistrationState } = usersSlice.actions;
 
 export default usersSlice.reducer;

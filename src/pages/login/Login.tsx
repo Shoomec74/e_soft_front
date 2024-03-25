@@ -7,11 +7,11 @@ import { Navigate, useLocation } from 'react-router-dom';
 import useForm from '../../hooks/useForm/useForm';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
 import {
-  clearError,
   signIn,
 } from '../../services/reducers/authorization.slice';
 import Button from '@mui/material/Button';
 import { Alert, Snackbar } from '@mui/material';
+import Notifications from '../../components/Notifications/Notifications';
 
 const Login: FC = () => {
   const { loginPage, titlePage } = styles;
@@ -39,17 +39,6 @@ const Login: FC = () => {
     e.preventDefault();
     dispatch(signIn({ login, password }));
     setValues(initialValuesForm);
-  };
-
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    dispatch(clearError());
   };
 
   if (cookie) {
@@ -97,7 +86,7 @@ const Login: FC = () => {
           Войти
         </Button>
 
-        <Snackbar
+        {/* <Snackbar
           open={!!error || isLogin}
           autoHideDuration={3000}
           onClose={handleClose}
@@ -110,7 +99,8 @@ const Login: FC = () => {
           >
             {!isLogin ? `${error}` : 'Успешно залогинились'}
           </Alert>
-        </Snackbar>
+        </Snackbar> */}
+        <Notifications componentError={error} flag={isLogin} successString='Вход в систему'/>
       </div>
     </Box>
   );

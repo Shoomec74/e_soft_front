@@ -1,12 +1,12 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore, createAction } from '@reduxjs/toolkit';
 import authorizationReducer from './reducers/authorization.slice';
-import modalsSlice from './reducers/modals.slice'
 import usersSlice from './reducers/user.slice'
+import tasksSlice from './reducers/tasks.slice'
 
 const rootReducer = combineReducers({
   auth: authorizationReducer,
-  modals: modalsSlice,
   users: usersSlice,
+  tasks: tasksSlice,
 });
 
 export const setupStore = () => {

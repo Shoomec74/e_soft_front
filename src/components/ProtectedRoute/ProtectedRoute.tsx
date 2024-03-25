@@ -1,11 +1,10 @@
-import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { FC } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 import { getCookie } from '../../api/auth/auth';
 
 interface ProtectedRouteProps {}
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = () => {
-  const location = useLocation();
+const ProtectedRoute: FC<ProtectedRouteProps> = () => {
   const token = getCookie('token'); // Реализация getCookie должна быть предоставлена
 
   // Проверка на наличие токена

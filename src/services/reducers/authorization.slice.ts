@@ -1,8 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import {
   signinApi,
   logoutApi,
-  registerApi,
   userInfoApi,
   updateTokenApi,
 } from '../../api/auth/auth';
@@ -10,9 +9,10 @@ import { setCookie, deleteCookie } from '../../api/auth/auth';
 import {
   TUserSigninData,
   TSigninResponse,
-  TUserRegisterData,
   TUserRegisterResponse,
-} from '../../utils/types/auth';
+  ICustomErrorResponse,
+} from '../../utils/types/types';
+import { clearErrorsState } from './commonActions';
 
 type TAuthorizationState = {
   isLoading: boolean;
@@ -44,7 +44,8 @@ export const signIn = createAsyncThunk(
       localStorage.setItem('refreshToken', response.refreshToken);
       return response;
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -58,7 +59,8 @@ export const signOut = createAsyncThunk(
       deleteCookie('token');
       return;
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -70,7 +72,8 @@ export const userInfo = createAsyncThunk(
     try {
       return await userInfoApi();
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -85,7 +88,8 @@ export const updateToken = createAsyncThunk(
       localStorage.setItem('refreshToken', response.refreshToken);
       return response;
     } catch (error) {
-      return rejectWithValue(error);
+      const customError = error as ICustomErrorResponse;
+      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
     }
   },
 );
@@ -94,12 +98,13 @@ const authorizationSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    clearError(state) {
-      state.error = null;
-    },
+    // clearError(state) {
+    //   state.error = null;
+    // },
   },
   extraReducers: (builder) => {
     builder
+
       //-- Обработка состояний во время входа в приложение --//
       .addCase(signIn.pending, (state) => {
         state.isLoading = true;
@@ -160,10 +165,13 @@ const authorizationSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
         state.isJwtExpired = true;
+      })
+      .addCase(clearErrorsState, (state) => {
+        state.error = null;
       });
   },
 });
 
-export const { clearError } = authorizationSlice.actions;
+// export const { clearError } = authorizationSlice.actions;
 
 export default authorizationSlice.reducer;

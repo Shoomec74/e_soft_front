@@ -5,7 +5,7 @@ import {
   TUserRegisterData,
   TUserRegisterResponse,
   TUserSigninData,
-} from '../../utils/types/auth';
+} from '../../utils/types/types';
 
 import { getReq, postReq } from '../apiMethods';
 

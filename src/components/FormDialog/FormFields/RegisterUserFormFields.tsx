@@ -1,19 +1,12 @@
-import {
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from '@mui/material';
+import { SelectChangeEvent, TextField } from '@mui/material';
 import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import useForm from '../../../hooks/useForm/useForm';
 import FixedTags from '../FixedTag/FixedTag';
-import { TUserRegisterResponse, UserRole } from '../../../utils/types/auth';
+import { TUserRegisterResponse, UserRole } from '../../../utils/types/types';
+import SelectField from './SelectField';
 
 // Определение типа для функции setSubordinates
-type SetSubordinates = Dispatch<
-  SetStateAction<TUserRegisterResponse[]>
->;
+type SetSubordinates = Dispatch<SetStateAction<TUserRegisterResponse[]>>;
 
 interface IProps {
   user?: TUserRegisterResponse;
@@ -21,7 +14,11 @@ interface IProps {
   setSubordinates?: SetSubordinates;
 }
 
-const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates }): React.ReactNode => {
+const RegisterUserFormFields: FC<IProps> = ({
+  user,
+  allUsers,
+  setSubordinates,
+}): React.ReactNode => {
   const initialValuesForm = {
     login: '',
     firstName: '',
@@ -32,7 +29,7 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
 
   const { values, handleChange, setValues } = useForm(initialValuesForm);
 
-  const [roleUser, setRole] = useState('');
+  const [roleUser, setRole] = useState<string>(user?.role || '');
 
   // Используем useEffect для установки начального значения login
   useEffect(() => {
@@ -62,7 +59,7 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
         margin="dense"
         id="name"
         name="login"
-        label="Email Address"
+        label="Email"
         type="email"
         fullWidth
         variant="standard"
@@ -74,21 +71,8 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
         required={!user}
         margin="dense"
         id="name"
-        name="firstName"
-        label="firstName"
-        type="text"
-        fullWidth
-        variant="standard"
-        onChange={handleChange}
-        value={firstName}
-        autoComplete="off"
-      />
-      <TextField
-        required={!user}
-        margin="dense"
-        id="name"
         name="lastName"
-        label="lastName"
+        label="Фамилия"
         type="text"
         fullWidth
         variant="standard"
@@ -100,8 +84,21 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
         required={!user}
         margin="dense"
         id="name"
+        name="firstName"
+        label="Имя"
+        type="text"
+        fullWidth
+        variant="standard"
+        onChange={handleChange}
+        value={firstName}
+        autoComplete="off"
+      />
+      <TextField
+        required={!user}
+        margin="dense"
+        id="name"
         name="middleName"
-        label="middleName"
+        label="Отчество"
         type="text"
         fullWidth
         variant="standard"
@@ -114,7 +111,7 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
         margin="dense"
         id="password"
         name="password"
-        label="password"
+        label="Пароль"
         //-- Избавляемся от автозаполнения браузера --//
         type={password.length > 0 ? 'password' : 'text'}
         fullWidth
@@ -123,22 +120,15 @@ const RegisterUserFormFields: FC<IProps> = ({ user, allUsers, setSubordinates })
         value={password}
         autoComplete="off"
       />
-      <InputLabel id="demo-simple-select-label">Role</InputLabel>
-      <Select
-        required={!user}
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
-        value={roleUser}
-        fullWidth
-        label="Role"
-        name="role"
-        onChange={handleChangeSelect}
-      >
-        <MenuItem value={UserRole.MANAGER}>{UserRole.MANAGER}</MenuItem>
-        <MenuItem value={UserRole.SUBORDINATE}>{UserRole.SUBORDINATE}</MenuItem>
-      </Select>
+      <SelectField
+        title="Роль"
+        nameKeyObject="role"
+        сhangeSelect={handleChangeSelect}
+        stateValue={roleUser}
+        enumProps={UserRole}
+      />
       {allUsers && roleUser === UserRole.MANAGER && (
-        <FixedTags allUsers={allUsers} setSubordinates={setSubordinates}/>
+        <FixedTags allUsers={allUsers} setSubordinates={setSubordinates} />
       )}
     </>
   );

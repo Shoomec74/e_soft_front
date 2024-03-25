@@ -1,18 +1,18 @@
 import {
-  ITokens,
-  TSigninResponse,
-  TSignoutResponse,
   TUserRegisterData,
   TUserRegisterResponse,
-  TUserSigninData,
-} from '../../utils/types/auth';
+} from '../../utils/types/types';
 
 import { getReq, postReq } from '../apiMethods';
 
 //-- Функция для отправки запроса регистрации пользователя --//
-async function registerApi(userInfo: TUserRegisterData) {
+async function registerUserApi(userInfo: TUserRegisterData) {
   //-- Отправляет данные пользователя на API для регистрации
-  return postReq<TUserRegisterResponse>({ uri: 'api/users', data: userInfo, auth: true });
+  return postReq<TUserRegisterResponse>({
+    uri: 'api/users',
+    data: userInfo,
+    auth: true,
+  });
 }
 
 //-- Функция для отправки запроса регистрации пользователя --//
@@ -22,4 +22,4 @@ async function getAllUsersApi() {
 }
 
 //-- Экспортирует функции API для их использования в других частях приложения --//
-export { registerApi, getAllUsersApi };
+export { registerUserApi, getAllUsersApi };

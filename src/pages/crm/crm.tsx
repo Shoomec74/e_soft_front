@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import Header from '../../components/Header/Header';
-import UserDivisionComponent from '../../components/UserDivision/UserDivision';
-import { useAppSelector } from '../../services/hooks/hooks';
+import TaskTracker from '../../components/Tasktracker/TaskTracker';
 
 const Crm: FC = () => {
   return (
     <>
       <Header />
+      <TaskTracker />
     </>
   );
 };

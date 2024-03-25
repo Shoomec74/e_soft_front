@@ -1,3 +1,4 @@
+import { ICustomErrorResponse } from '../utils/types/types';
 import { getCookie } from './auth/auth';
 
 //-- Базовый URL API --//
@@ -57,8 +58,17 @@ export function checkRes<T>(res: IResponse<T>): Promise<T> | Promise<never> {
   if (res.ok) {
     return res.json();
   } else {
-    //-- В случае ошибки возвращаем Promise.reject с описанием ошибки --//
-    return Promise.reject([`Ошибка ${res.status}`, res.json()]);
+    // Сначала конвертируем ответ в JSON, а потом уже отклоняем промис
+    return res.json().then((errorBody) => {
+      // Предполагается, что сервер возвращает JSON с описанием ошибки
+      // Можно дополнительно настроить структуру объекта ошибки
+      const error: ICustomErrorResponse = {
+        status: res.status,
+        statusText: res.statusText,
+        error: errorBody,
+      };
+      return Promise.reject(error);
+    });
   }
 }
 

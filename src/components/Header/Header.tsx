@@ -1,21 +1,21 @@
-import { Alert, Button, Snackbar, Toolbar } from '@mui/material';
+import { Button, Toolbar } from '@mui/material';
 import { FC, useState } from 'react';
 import styles from './Header.module.less';
 import FormDialog from '../FormDialog/FormDialog';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
 import {
-  clearErrorUsers,
-  register,
+  registerUser,
   resetRegistrationState,
 } from '../../services/reducers/user.slice';
 import { signOut } from '../../services/reducers/authorization.slice';
-import { TUserRegisterResponse } from '../../utils/types/auth';
+import { TUserRegisterResponse, TypeForm } from '../../utils/types/types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAbility } from '@casl/react';
-import { Action } from '../../ability/Ability';
-import { AbilityContext } from '../../ability/AbilityContext';
+import { AbilityContext, Can } from '../../ability/AbilityContext';
 import RegisterUserFormFields from '../FormDialog/FormFields/RegisterUserFormFields';
 import TaskCreateFormFields from '../FormDialog/FormFields/TaskCreateFormFields';
+import { createTask } from '../../services/reducers/tasks.slice';
+import Notifications from '../Notifications/Notifications';
 
 const Header: FC = () => {
   const { header_bar } = styles;
@@ -29,8 +29,9 @@ const Header: FC = () => {
 
   const location = useLocation();
 
-  const { isLoading, isRegistered, error, allUsers } = useAppSelector(
+  const { isLoading, isRegistered, error, allUsers, user } = useAppSelector(
     (state) => ({
+      user: state.auth.user,
       isLoading: state.users.isLoading,
       isRegistered: state.users.isRegistered,
       error: state.users.error,
@@ -38,30 +39,18 @@ const Header: FC = () => {
     }),
   );
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    dispath(clearErrorUsers());
-    dispath(resetRegistrationState());
-  };
-
   const [open, setOpen] = useState(false);
   const [subordinates, setSubordinates] = useState<TUserRegisterResponse[]>([]);
-  const [formType, setFormType] = useState<string>('');
+  const [formType, setFormType] = useState<TypeForm>(TypeForm.DEFAULT);
 
-  const handleOpenDialog = (type: string) => {
+  const handleOpenDialog = (type: TypeForm) => {
     setFormType(type); // Устанавливаем тип формы
     setOpen(true);
   };
 
   const handleCloseDialog = () => {
     setOpen(false);
-    setFormType(''); // Очищаем тип формы при закрытии
+    setFormType(TypeForm.DEFAULT); // Очищаем тип формы при закрытии
   };
 
   const handleNavLink = () => {
@@ -69,9 +58,13 @@ const Header: FC = () => {
     navigate(newPath); // Программно перенавигируйте пользователя
   };
 
-  const handleSubmitDialog = (formData: any) => {
+  const handleSubmitRegisterDialog = (formData: any) => {
     const usersSubordinateId = subordinates.map((user) => user.id);
-    dispath(register({ ...formData, subordinateIds: usersSubordinateId }));
+    dispath(registerUser({ ...formData, subordinateIds: usersSubordinateId }));
+  };
+
+  const handleSubmitCreateTaskDialog = (formData: any) => {
+    dispath(createTask({ ...formData }));
   };
 
   const handleLogoutButton = () => {
@@ -80,24 +73,28 @@ const Header: FC = () => {
 
   return (
     <Toolbar className={header_bar}>
-      {ability.can(Action.Access, 'admin') && location.pathname !== '/crm' && (
-        <Button
-          style={btnStyle}
-          variant="contained"
-          type="button"
-          onClick={() => handleOpenDialog('registerUser')}
-        >
-          Зарегистрировать пользователя
-        </Button>
-      )}
+      <Can I="access" a="admin" ability={ability}>
+        {(allowed) =>
+          location.pathname !== '/crm' && (
+            <Button
+              style={btnStyle}
+              variant="contained"
+              type="button"
+              onClick={() => handleOpenDialog(TypeForm.REGISTER_USER)}
+            >
+              Зарегистрировать пользователя
+            </Button>
+          )
+        }
+      </Can>
       {location.pathname === '/crm' && (
         <Button
           style={btnStyle}
           variant="contained"
           type="button"
-          onClick={() => handleOpenDialog('addTask')}
+          onClick={() => handleOpenDialog(TypeForm.CREATE_TASK)}
         >
-          Добавить задачу
+          Новая задача
         </Button>
       )}
       <Button
@@ -108,42 +105,45 @@ const Header: FC = () => {
       >
         Выйти
       </Button>
-      {ability.can(Action.Access, 'admin') && (
-        <Button
-          style={btnStyle}
-          variant="contained"
-          type="button"
-          onClick={handleNavLink}
-        >
-          {location.pathname === '/crm' ? 'Админпанель' : 'CRM'}
-        </Button>
-      )}
-      <Snackbar
-        open={!!error || isRegistered}
-        autoHideDuration={3000}
-        onClose={handleClose}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={!isRegistered ? 'error' : 'success'}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {!isRegistered ? `${error}` : 'Пользователь успешно зарегистрирован'}
-        </Alert>
-      </Snackbar>
+      <Can I="access" a="admin" ability={ability}>
+        {(allowed) => (
+          <Button
+            style={btnStyle}
+            variant="contained"
+            type="button"
+            onClick={handleNavLink}
+          >
+            {location.pathname === '/crm' ? 'Админпанель' : 'CRM'}
+          </Button>
+        )}
+      </Can>
+      <Notifications
+        componentError={error}
+        flag={isRegistered}
+        successString="Пользователь успешно зарегистрирован"
+        clearState={resetRegistrationState}
+      />
       <FormDialog
         open={open}
         onClose={handleCloseDialog}
-        handleSubmitDialog={handleSubmitDialog}
+        handleSubmitDialog={
+          formType === TypeForm.REGISTER_USER
+            ? handleSubmitRegisterDialog
+            : handleSubmitCreateTaskDialog
+        }
+        typeForm={formType}
       >
-        {formType === 'registerUser' && (
+        {formType === TypeForm.REGISTER_USER && (
           <RegisterUserFormFields
             allUsers={allUsers}
             setSubordinates={setSubordinates}
           />
         )}
-        {formType === 'addTask' && <TaskCreateFormFields />}
+        {formType === TypeForm.CREATE_TASK && (
+          <TaskCreateFormFields
+            allSubordinates={user && user.subordinates ? user.subordinates : []}
+          />
+        )}
       </FormDialog>
     </Toolbar>
   );

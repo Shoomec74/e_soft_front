@@ -1,12 +1,27 @@
-import React, { FC } from "react";
-import page404Styles from "./page404.module.less";
+import React from 'react';
+import { createTheme, ThemeProvider, Container, Typography } from '@mui/material';
 
-export const Page404: FC = () => {
-  const { page404, neonText } = page404Styles;
+// Создаем тему с шрифтом Montserrat
+const theme = createTheme({
+  typography: {
+    fontFamily: [
+      'Montserrat',
+      '"Segoe UI"',
+    ].join(','),
+  },
+});
+
+export const Page404 = () => {
   return (
-    <div className={`${page404} text text_type_main-medium`}>
-      <h1 className={`${neonText} text text_type_digits-large`}>404</h1>
-      <h2 className={neonText}>Упс, такой страницы не существует</h2>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="sm" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <Typography variant="h1" component="h1" sx={{ fontSize: '4rem', mb: 4 }}>
+          404
+        </Typography>
+        <Typography variant="h5" sx={{ textAlign: 'center' }}>
+          Упс, такой страницы не существует
+        </Typography>
+      </Container>
+    </ThemeProvider>
   );
 };

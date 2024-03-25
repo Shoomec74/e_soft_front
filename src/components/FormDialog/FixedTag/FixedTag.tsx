@@ -1,6 +1,6 @@
 import { Autocomplete, Chip, TextField } from '@mui/material';
 import { FC, useState } from 'react';
-import { TUserRegisterResponse } from '../../../utils/types/auth';
+import { TUserRegisterResponse } from '../../../utils/types/types';
 
 // Определение типа для функции setSubordinates
 type SetSubordinates = React.Dispatch<
@@ -45,7 +45,9 @@ const FixedTags: FC<IPropsFixedTags> = ({ allUsers, setSubordinates }) => {
         ]);
         if (setSubordinates) {
           setSubordinates([
-            ...newValue.filter((option) => fixedOptions?.indexOf(option) === -1),
+            ...newValue.filter(
+              (option) => fixedOptions?.indexOf(option) === -1,
+            ),
           ]);
         }
       }}
@@ -76,9 +78,9 @@ const FixedTags: FC<IPropsFixedTags> = ({ allUsers, setSubordinates }) => {
       ) => (
         <TextField
           {...params}
-          label="Выбор подчиненных"
-          placeholder="Выбрать подчиненных"
-        /> // Поле ввода с лейблом и плейсхолдером
+          label="Доступный персонал"
+          placeholder="Выберите сотрудника"
+        />
       )}
     />
   );
