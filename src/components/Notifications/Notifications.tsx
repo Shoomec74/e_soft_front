@@ -19,33 +19,38 @@ const Notifications: FC<IProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
 
+    // Предполагается, что функция clearErrorsState() существует
     dispatch(clearErrorsState());
     if (clearState) {
       dispatch(clearState());
     }
   };
 
+  // Определяем, следует ли отображать уведомление
+  const shouldShowNotification = !!componentError || flag;
+
+  // Определяем тип уведомления и текст
+  const alertSeverity = componentError ? 'error' : 'success';
+  const message = componentError ? componentError : successString;
+
   return (
     <Snackbar
-      open={!!componentError || flag}
+      open={shouldShowNotification}
       autoHideDuration={3000}
       onClose={handleClose}
     >
       <Alert
         onClose={handleClose}
-        severity={!flag ? 'error' : 'success'}
+        severity={alertSeverity}
         variant="filled"
         sx={{ width: '100%' }}
       >
-        {!flag ? `${componentError}` : successString}
+        {message}
       </Alert>
     </Snackbar>
   );

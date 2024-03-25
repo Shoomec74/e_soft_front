@@ -11,18 +11,20 @@ import { clearErrorsState } from './commonActions';
 
 type TUsersState = {
   isLoading: boolean;
-  isRegistered: boolean;
+  isUserRegistered: boolean;
+  isUserUpdated: boolean;
   user: TSigninResponse | null;
   allUsers: TUserRegisterResponse[] | null;
-  error: string | null;
+  errorUsers: string | null;
 };
 
 const initialState: TUsersState = {
   isLoading: false,
-  isRegistered: false,
+  isUserRegistered: false,
+  isUserUpdated: false,
   user: null,
   allUsers: null,
-  error: null,
+  errorUsers: null,
 };
 
 //-- Асинхронное thunk-действие регистраии в приложении --//
@@ -57,8 +59,9 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    resetRegistrationState(state) {
-      state.isRegistered = false;
+    resetUserState(state) {
+      state.isUserRegistered = false;
+      state.isUserUpdated = false;
     },
   },
   extraReducers: (builder) => {
@@ -66,44 +69,44 @@ const usersSlice = createSlice({
       //-- Обработка состояний во время регистрации --//
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
-        state.isRegistered = false;
+        state.errorUsers = null;
+        state.isUserRegistered = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isRegistered = true;
+        state.isUserRegistered = true;
         state.allUsers = [
           ...(state.allUsers || []),
           action.payload as TUserRegisterResponse,
         ];
-        state.error = null;
+        state.errorUsers = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.isRegistered = false;
-        state.error = action.payload as string;
+        state.isUserRegistered = false;
+        state.errorUsers = action.payload as string;
       })
 
       //-- Обработка состояний во время получения всех пользователей --//
       .addCase(getAllUsers.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.errorUsers = null;
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.allUsers = action.payload;
-        state.error = null;
+        state.errorUsers = null;
       })
       .addCase(getAllUsers.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorUsers = action.payload as string;
       })
       .addCase(clearErrorsState, (state) => {
-        state.error = null;
+        state.errorUsers = null;
       });
   },
 });
 
-export const { resetRegistrationState } = usersSlice.actions;
+export const { resetUserState } = usersSlice.actions;
 
 export default usersSlice.reducer;

@@ -6,20 +6,17 @@ import { getCookie } from '../../api/auth/auth';
 import { Navigate, useLocation } from 'react-router-dom';
 import useForm from '../../hooks/useForm/useForm';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
-import {
-  signIn,
-} from '../../services/reducers/authorization.slice';
+import { signIn } from '../../services/reducers/authorization.slice';
 import Button from '@mui/material/Button';
-import { Alert, Snackbar } from '@mui/material';
 import Notifications from '../../components/Notifications/Notifications';
 
 const Login: FC = () => {
   const { loginPage, titlePage } = styles;
 
-  const { isLoading, isLogin, error } = useAppSelector((state) => ({
+  const { isLoading, isLogin, errorAuth } = useAppSelector((state) => ({
     isLoading: state.auth.isLoading,
     isLogin: state.auth.isLogin,
-    error: state.auth.error,
+    errorAuth: state.auth.errorAuth,
   }));
 
   const cookie = getCookie('token');
@@ -59,7 +56,7 @@ const Login: FC = () => {
         <h1 className={titlePage}>Вход в систему</h1>
         <TextField
           required
-          label="Login"
+          label="Логин"
           type="email"
           name="login"
           value={login}
@@ -70,37 +67,28 @@ const Login: FC = () => {
         />
         <TextField
           required
-          label="Password"
+          label="Пароль"
           type="password"
           name="password"
           value={password}
           onChange={handleChange}
           autoComplete="current-password"
           disabled={isLoading}
+          helperText={password !== '' && errors.password}
+          error={!!errors.password && password !== ''}
         />
         <Button
           variant="contained"
           type="submit"
-          disabled={!!errors.login || isLoading}
+          disabled={!!errors.login || !!errors.password || isLoading}
         >
           Войти
         </Button>
-
-        {/* <Snackbar
-          open={!!error || isLogin}
-          autoHideDuration={3000}
-          onClose={handleClose}
-        >
-          <Alert
-            onClose={handleClose}
-            severity={!isLogin ? 'error' : 'success'}
-            variant="filled"
-            sx={{ width: '100%' }}
-          >
-            {!isLogin ? `${error}` : 'Успешно залогинились'}
-          </Alert>
-        </Snackbar> */}
-        <Notifications componentError={error} flag={isLogin} successString='Вход в систему'/>
+        <Notifications
+          componentError={errorAuth}
+          flag={isLogin}
+          successString="Вход в систему"
+        />
       </div>
     </Box>
   );

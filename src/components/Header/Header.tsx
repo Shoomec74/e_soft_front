@@ -5,7 +5,7 @@ import FormDialog from '../FormDialog/FormDialog';
 import { useAppDispatch, useAppSelector } from '../../services/hooks/hooks';
 import {
   registerUser,
-  resetRegistrationState,
+  resetUserState,
 } from '../../services/reducers/user.slice';
 import { signOut } from '../../services/reducers/authorization.slice';
 import { TUserRegisterResponse, TypeForm } from '../../utils/types/types';
@@ -14,7 +14,7 @@ import { useAbility } from '@casl/react';
 import { AbilityContext, Can } from '../../ability/AbilityContext';
 import RegisterUserFormFields from '../FormDialog/FormFields/RegisterUserFormFields';
 import TaskCreateFormFields from '../FormDialog/FormFields/TaskCreateFormFields';
-import { createTask } from '../../services/reducers/tasks.slice';
+import { createTask, resetTaskState } from '../../services/reducers/tasks.slice';
 import Notifications from '../Notifications/Notifications';
 
 const Header: FC = () => {
@@ -29,15 +29,27 @@ const Header: FC = () => {
 
   const location = useLocation();
 
-  const { isLoading, isRegistered, error, allUsers, user } = useAppSelector(
-    (state) => ({
-      user: state.auth.user,
-      isLoading: state.users.isLoading,
-      isRegistered: state.users.isRegistered,
-      error: state.users.error,
-      allUsers: state.users.allUsers,
-    }),
-  );
+  const {
+    isLoading,
+    isUserRegistered,
+    errorUsers,
+    allUsers,
+    user,
+    isUserUpdated,
+    errorTask,
+    isCreated,
+    isUpdated
+  } = useAppSelector((state) => ({
+    user: state.auth.user,
+    isLoading: state.users.isLoading,
+    isUserRegistered: state.users.isUserRegistered,
+    isUserUpdated: state.users.isUserUpdated,
+    errorUsers: state.users.errorUsers,
+    allUsers: state.users.allUsers,
+    errorTask: state.tasks.errorTask,
+    isCreated: state.tasks.isCreated,
+    isUpdated: state.tasks.isUpdated,
+  }));
 
   const [open, setOpen] = useState(false);
   const [subordinates, setSubordinates] = useState<TUserRegisterResponse[]>([]);
@@ -117,12 +129,6 @@ const Header: FC = () => {
           </Button>
         )}
       </Can>
-      <Notifications
-        componentError={error}
-        flag={isRegistered}
-        successString="Пользователь успешно зарегистрирован"
-        clearState={resetRegistrationState}
-      />
       <FormDialog
         open={open}
         onClose={handleCloseDialog}
@@ -145,6 +151,30 @@ const Header: FC = () => {
           />
         )}
       </FormDialog>
+      <Notifications
+        componentError={errorUsers}
+        flag={isUserRegistered}
+        successString="Пользователь успешно зарегистрирован"
+        clearState={resetUserState}
+      />
+      <Notifications
+        componentError={errorUsers}
+        flag={isUserUpdated}
+        successString="Пользователь успешно обновлен"
+        clearState={resetUserState}
+      />
+      <Notifications
+        componentError={errorTask}
+        flag={isCreated}
+        successString="Задача успешно создана"
+        clearState={resetTaskState}
+      />
+      <Notifications
+        componentError={errorTask}
+        flag={isUpdated}
+        successString="Задача успешно обновлена"
+        clearState={resetTaskState}
+      />
     </Toolbar>
   );
 };

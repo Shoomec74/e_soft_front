@@ -15,13 +15,17 @@ import { clearErrorsState } from './commonActions';
 type TTasksState = {
   isLoading: boolean;
   allTasks: TCreateTaskResponse[];
-  error: string | null;
+  errorTask: string | null;
+  isCreated: boolean;
+  isUpdated: boolean;
 };
 
 const initialState: TTasksState = {
   isLoading: false,
   allTasks: [],
-  error: null,
+  errorTask: null,
+  isCreated: false,
+  isUpdated: false,
 };
 
 //-- Асинхронное thunk-действие входа в приложение --//
@@ -32,7 +36,11 @@ export const createTask = createAsyncThunk(
       return await createTaskApi(taskdata);
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -50,7 +58,11 @@ export const updateTask = createAsyncThunk(
       return await updateTaskApi(taskdata, taskid);
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -63,7 +75,11 @@ export const getAllTasks = createAsyncThunk(
       return await getAllTasksApi();
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -71,64 +87,79 @@ export const getAllTasks = createAsyncThunk(
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
-  reducers: {},
+  reducers: {
+    resetTaskState(state) {
+      state.isCreated = false;
+      state.isUpdated = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       //-- Обработка состояний во время создания задания --//
       .addCase(createTask.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.errorTask = null;
+        state.isCreated = false;
       })
       .addCase(createTask.fulfilled, (state, action) => {
         state.isLoading = false;
         state.allTasks = [...(state.allTasks || []), action.payload];
-        state.error = null;
+        state.errorTask = null;
+        state.isCreated = true;
       })
       .addCase(createTask.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorTask = action.payload as string;
+        state.isCreated = false;
       })
 
       //-- Обработка состояний во время получения всех заданий --//
       .addCase(getAllTasks.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.errorTask = null;
       })
       .addCase(getAllTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.allTasks = action.payload;
-        state.error = null;
+        state.errorTask = null;
       })
       .addCase(getAllTasks.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorTask = action.payload as string;
       })
 
       //-- Обработка состояний во время обновления задания --//
       .addCase(updateTask.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.errorTask = null;
+        state.isUpdated = false;
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         state.isLoading = false;
         if (action.payload) {
           // Ищем индекс обновленной задачи в массиве
-          const index = state.allTasks.findIndex(task => task.id === action.payload.id);
+          const index = state.allTasks.findIndex(
+            (task) => task.id === action.payload.id,
+          );
           // Если задача найдена, обновляем её данные
           if (index !== -1) {
             state.allTasks[index] = action.payload;
           }
         }
-        state.error = null;
+        state.errorTask = null;
+        state.isUpdated = true;
       })
       .addCase(updateTask.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorTask = action.payload as string;
       })
       .addCase(clearErrorsState, (state) => {
-        state.error = null;
-      })
+        state.errorTask = null;
+        state.isUpdated = false;
+      });
   },
 });
+
+export const { resetTaskState } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

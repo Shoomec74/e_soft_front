@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -34,6 +34,18 @@ const FormDialog: FC<IProps> = ({
   const handleDateChange = (date: moment.Moment | null) => {
     setSelectedDate(date);
   };
+
+  useEffect(() => {
+    if (task) {
+      setSelectedDate(moment(task?.deadline));
+    }
+  }, [task]);
+
+  useEffect(() => {
+    if (!task) {
+      setSelectedDate(moment());
+    }
+  }, []);
 
   const dialogTitle =
     typeForm === TypeForm.REGISTER_USER
@@ -101,7 +113,7 @@ const FormDialog: FC<IProps> = ({
                 <DatePicker
                   sx={{ mt: 2, mb: 2 }}
                   label="Дата окончания"
-                  value={selectedDate ? selectedDate : moment(task?.deadline)}
+                  value={selectedDate}
                   onChange={handleDateChange}
                   disabled={disableFlag}
                 />

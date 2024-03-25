@@ -20,7 +20,7 @@ type TAuthorizationState = {
   isRegistered: boolean;
   user: TSigninResponse | null;
   allUsers: TUserRegisterResponse[] | null;
-  error: string | null;
+  errorAuth: string | null;
   isJwtExpired: boolean;
 };
 
@@ -30,7 +30,7 @@ const initialState: TAuthorizationState = {
   isLogin: false,
   user: null,
   allUsers: null,
-  error: null,
+  errorAuth: null,
   isJwtExpired: false,
 };
 
@@ -45,7 +45,11 @@ export const signIn = createAsyncThunk(
       return response;
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -60,7 +64,11 @@ export const signOut = createAsyncThunk(
       return;
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -73,7 +81,11 @@ export const userInfo = createAsyncThunk(
       return await userInfoApi();
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -89,7 +101,11 @@ export const updateToken = createAsyncThunk(
       return response;
     } catch (error) {
       const customError = error as ICustomErrorResponse;
-      return rejectWithValue(Array.isArray(customError.error.message) ? `${customError.status} - ${customError.statusText}` : customError.error.message);
+      return rejectWithValue(
+        Array.isArray(customError.error.message)
+          ? `${customError.status} - ${customError.statusText}`
+          : customError.error.message,
+      );
     }
   },
 );
@@ -98,9 +114,10 @@ const authorizationSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // clearError(state) {
-    //   state.error = null;
-    // },
+    clearAuthError(state) {
+      state.isRegistered = false;
+      state.isLogin = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -108,17 +125,17 @@ const authorizationSlice = createSlice({
       //-- Обработка состояний во время входа в приложение --//
       .addCase(signIn.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.errorAuth = null;
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload as TSigninResponse;
         state.isLogin = true;
-        state.error = null;
+        state.errorAuth = null;
       })
       .addCase(signIn.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorAuth = action.payload as string;
       })
 
       //-- Обработка состояний выхода из приложения --//
@@ -132,7 +149,7 @@ const authorizationSlice = createSlice({
       })
       .addCase(signOut.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorAuth = action.payload as string;
       })
 
       //-- Обработка состояний получения информации о пользователе --//
@@ -143,12 +160,12 @@ const authorizationSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload as TSigninResponse;
         state.isLogin = true;
-        state.error = null;
+        state.errorAuth = null;
         state.isJwtExpired = false;
       })
       .addCase(userInfo.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorAuth = action.payload as string;
         state.isJwtExpired = true;
       })
 
@@ -158,20 +175,20 @@ const authorizationSlice = createSlice({
       })
       .addCase(updateToken.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.error = null;
+        state.errorAuth = null;
         state.isJwtExpired = false;
       })
       .addCase(updateToken.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.errorAuth = action.payload as string;
         state.isJwtExpired = true;
       })
       .addCase(clearErrorsState, (state) => {
-        state.error = null;
+        state.errorAuth = null;
       });
   },
 });
 
-// export const { clearError } = authorizationSlice.actions;
+export const { clearAuthError } = authorizationSlice.actions;
 
 export default authorizationSlice.reducer;
