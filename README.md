@@ -29,7 +29,7 @@
 
 Клонируйте репозиторий на ваш локальный компьютер.
 ```
-git clone https://github.com/Shoomec74/e_soft_front.git
+git clone https://github.com/Shoomec74/e_soft_task.git
 ```
 
 **Шаг 2. Создайте .env в корне проекта.**
