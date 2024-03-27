@@ -1,7 +1,11 @@
-import { combineReducers, configureStore, createAction } from '@reduxjs/toolkit';
+import {
+  combineReducers,
+  configureStore,
+  createAction,
+} from '@reduxjs/toolkit';
 import authorizationReducer from './reducers/authorization.slice';
-import usersSlice from './reducers/user.slice'
-import tasksSlice from './reducers/tasks.slice'
+import usersSlice from './reducers/user.slice';
+import tasksSlice from './reducers/tasks.slice';
 
 const rootReducer = combineReducers({
   auth: authorizationReducer,
@@ -12,6 +16,10 @@ const rootReducer = combineReducers({
 export const setupStore = () => {
   return configureStore({
     reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false, //-- Отключаем проверку на несериализуемые значения полностью --//
+      }),
   });
 };
 
