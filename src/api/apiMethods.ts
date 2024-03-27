@@ -6,10 +6,8 @@ let BASE_URL = 'https://cleanwaveapp.ru';
 
 if (process.env.NODE_ENV === 'development') {
   BASE_URL = process.env.REACT_APP_URL_DEV || '';
-  console.log(BASE_URL);
 }else {
   BASE_URL = process.env.REACT_APP_URL_PROD || '';
-  console.log(BASE_URL);
 }
 
 //-- Расширенный интерфейс стандартного Response для добавления типизации к методу json() --//

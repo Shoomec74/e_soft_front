@@ -39,7 +39,7 @@ git clone https://github.com/Shoomec74/e_soft_front.git
 ```yaml
 # === Для работы приложения ===
 REACT_APP_URL_PROD=                     #Значение базового URL для обращений к API сервера например: https://cleanwaveapp.ru
-REACT_APP_URL_DEV=                      #Значение базового URL для обращений к API сервера на локальной машине например: http://localhost:3000
+REACT_APP_URL_DEV=                      #Значение базового URL для обращений к API сервера на локальной машине, так же укажите порт, например: http://localhost:3000
 ```
 **Шаг 3. Установите зависимости проекта.**
 Установите зависимости, используя
